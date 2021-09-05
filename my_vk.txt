@@ -1,0 +1,87 @@
+DROP DATABASE vk;
+CREATE DATABASE vk;
+USE vk;
+
+SELECT 1 FROM DUAL;
+SELECT 1;
+SELECT NOW();
+SELECT current_timestamp();
+
+CREATE TABLE users (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'Идентификатор строки', -- искуственный ключ
+	first_name VARCHAR(100) NOT NULL COMMENT 'Имя пользователя',
+    last_name VARCHAR(100) NOT NULL COMMENT 'Фамилия пользователя',
+    birthday DATE NOT NULL COMMENT 'Дата рождения',
+    gender CHAR(1) NOT NULL COMMENT 'Пол',
+    email VARCHAR(100) NOT NULL UNIQUE COMMENT 'Email пользователя',  -- email + phone - натуральный ключ
+    phone VARCHAR(11) NOT NULL UNIQUE COMMENT 'Номер телефона пользователя',    
+    created_at DATETIME COMMENT 'Дата и время создания строки',
+    updated_at DATETIME COMMENT 'Дата и время обновленния строки'
+) COMMENT 'Таблица пользователей';
+
+CREATE TABLE profiles (
+    user_id INT UNSIGNED NOT NULL PRIMARY KEY COMMENT 'Идентификатор строки',
+	city VARCHAR(100) COMMENT 'Город проживания',
+    country VARCHAR(100) COMMENT 'Старана проживания',    
+    `status` VARCHAR(10) COMMENT 'Текущий статус',
+	created_at DATETIME COMMENT 'Дата и время создания строки',    
+    updated_at DATETIME COMMENT 'Дата и время обновленния строки'
+) COMMENT "Таблица профилей";
+
+ALTER TABLE profiles ADD CONSTRAINT profiles_user_id FOREIGN KEY (user_id) REFERENCES users(id);
+
+CREATE TABLE friendship (
+	user_id INT UNSIGNED NOT NULL COMMENT 'Ссылка на инициатора дружеских отношений',
+    friend_id INT UNSIGNED NOT NULL COMMENT 'Ссылка на получателя запроса о дружбе',
+    request_type VARCHAR(10) COMMENT 'Тип запроса',
+    requested_at DATETIME COMMENT 'Время отправки приглашения',
+    confirmed_at DATETIME COMMENT 'Время подтверждения приглашения',
+    created_at DATETIME COMMENT 'Дата и время создания строки',    
+    updated_at DATETIME COMMENT 'Дата и время обновленния строки',
+    PRIMARY KEY (user_id, friend_id) COMMENT 'Составной первичный ключ'
+);
+
+ALTER TABLE friendship ADD CONSTRAINT friendship_user_id FOREIGN KEY (user_id) REFERENCES users(id); -- 1:n
+ALTER TABLE friendship ADD CONSTRAINT friendship_friend_id FOREIGN KEY (friend_id) REFERENCES users(id); -- 1:n
+
+CREATE TABLE friendship_request_types (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки",
+  name VARCHAR(150) NOT NULL UNIQUE COMMENT "Название статуса",
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",  
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"  
+) COMMENT "Типы запроса на дружбы";
+
+CREATE TABLE messages (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'ИД сообщения',
+    from_user INT UNSIGNED NOT NULL COMMENT 'Создатель сообщения',
+    to_user INT UNSIGNED NOT NULL COMMENT 'Получатель сообщения',
+    mes_text TEXT NOT NULL COMMENT 'Текст сообщения',
+    mes_status BOOLEAN COMMENT 'Прочитано или нет',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Время создания сообщения'
+) COMMENT 'Сообщения';
+
+ALTER TABLE messages ADD CONSTRAINT masseges_from_user FOREIGN KEY (from_user) REFERENCES users(id);
+ALTER TABLE messages ADD CONSTRAINT masseges_to_user FOREIGN KEY (to_user) REFERENCES users(id);
+
+CREATE TABLE community (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'ИД сообщества',
+    author_id INT UNSIGNED NOT NULL COMMENT 'Создатель и владелец сообщества',
+	title VARCHAR(25) UNIQUE COMMENT 'Название сообщества',
+	com_description VARCHAR(500) COMMENT 'Описание сообщества',
+    com_type VARCHAR(20) COMMENT 'Тип сообщества',
+    created_at DATETIME COMMENT 'Дата и время создания сообщества',    
+    updated_at DATETIME COMMENT 'Дата и время обновленния информации о сообществе'
+) COMMENT 'Сообщества';
+
+ALTER TABLE community ADD CONSTRAINT community_author_id FOREIGN KEY (author_id) REFERENCES users(id);
+
+CREATE TABLE community_user (
+    com_id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ИД сообщества',
+    user_id INT UNSIGNED NOT NULL COMMENT ' ИД пользователя',
+    created_at DATETIME COMMENT 'Дата и время создания сообщества',    
+    updated_at DATETIME COMMENT 'Дата и время обновленния информации о сообществе' ,
+    PRIMARY KEY (com_id, user_id) COMMENT 'Составной первичный ключ'
+) COMMENT 'Подписчики сообщества';
+
+ALTER TABLE community_user ADD CONSTRAINT community_user_com_id FOREIGN KEY (com_id) REFERENCES community(id);
+ALTER TABLE community_user ADD CONSTRAINT community_user_user_id FOREIGN KEY (user_id) REFERENCES users(id);

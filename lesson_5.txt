@@ -1,0 +1,96 @@
+USE shop;
+
+/* для первого задания
+UPDATE users
+SET users.created_at = null
+WHERE (users.name = 'Геннадий' OR users.name = 'Иван' OR users.name = 'Наталья') AND users.id < 1000;
+*/
+-- select * from users;
+
+/* Task_5_1
+update users set created_at = NOW()
+where created_at is NULL AND id < 101; -- id < 101 требуется чтобы не возникала ошибка 1175 (про update)
+
+update users set users.updated_at = NOW()
+where users.updated_at is NULL AND id < 101;  -- id < 101 не требуется в запросе
+*/
+
+/* Task_5_2 
+
+describe products;
+ALTER TABLE products 
+CHANGE COLUMN created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+
+describe products;
+select * from products;
+*/
+
+/* Task_5_3
+
+select * from storehouses_products;
+
+select *, value != 0 AS gtype from storehouses_products 
+ORDER BY gtype DESC, value;
+*/
+
+/* Task_5_4
+select * from users;
+select id, name, birthday_at,
+	CASE
+		WHEN DATE_FORMAT(birthday_at, '%m')  = 01 THEN 'jan'
+		WHEN DATE_FORMAT(birthday_at, '%m')  = 02 THEN 'feb'
+        WHEN DATE_FORMAT(birthday_at, '%m')  = 03 THEN 'mar'
+		WHEN DATE_FORMAT(birthday_at, '%m')  = 04 THEN 'aip'
+        WHEN DATE_FORMAT(birthday_at, '%m')  = 05 THEN 'may'
+		WHEN DATE_FORMAT(birthday_at, '%m')  = 06 THEN 'jun'
+        WHEN DATE_FORMAT(birthday_at, '%m')  = 07 THEN 'jul'
+		WHEN DATE_FORMAT(birthday_at, '%m')  = 08 THEN 'august'
+        WHEN DATE_FORMAT(birthday_at, '%m')  = 09 THEN 'sep'
+		WHEN DATE_FORMAT(birthday_at, '%m')  = 10 THEN 'oct'
+        WHEN DATE_FORMAT(birthday_at, '%m')  = 11 THEN 'nov'
+		WHEN DATE_FORMAT(birthday_at, '%m')  = 12 THEN 'dec'
+	END AS mouthBirth 
+from users 
+where DATE_FORMAT(birthday_at, '%m')  = 05 or DATE_FORMAT(birthday_at, '%m')  = 08; */
+
+/* Task_5_5
+
+SELECT * FROM catalogs 
+WHERE id IN (5, 1, 2)
+WHERE id IN (5, 1, 2)
+order by FIELD(id, 5, 1, 2);
+*/
+
+/* Task_5_1agrigation 
+
+select *,
+	FLOOR((TO_DAYS(NOW()) - TO_DAYS(birthday_at))/365.25) AS age
+from users;
+
+SELECT FLOOR(AVG(age)) AS avarage_age 
+FROM
+	(
+		SELECT *,
+			FLOOR((TO_DAYS(NOW()) - TO_DAYS(birthday_at))/365.25) AS age 
+		FROM users
+	) AS inf;
+*/
+
+/* Task_5_2agrigation
+
+select * from users;
+
+select 
+	DAYNAME(CONCAT(YEAR(NOW()), '-', SUBSTRING(birthday_at, 6, 10))) AS day_to_count,
+    COUNT(DAYNAME(CONCAT(YEAR(NOW()), '-', SUBSTRING(birthday_at, 6, 10)))) as num_birth
+from users
+group by day_to_count; */
+
+ /*  Task_5_3agrigation */
+ 
+SELECT FLOOR(exp(sum(ln(id)))) AS multiplication 
+FROM storehouses_products;
+
+
+
+
